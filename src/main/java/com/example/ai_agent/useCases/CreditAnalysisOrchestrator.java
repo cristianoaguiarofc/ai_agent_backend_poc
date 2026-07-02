@@ -1,5 +1,6 @@
 package com.example.ai_agent.useCases;
 
+import com.example.ai_agent.guardrails.PromptInjectionGuardrail;
 import com.example.ai_agent.models.CreditAnalysisStage;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,32 @@ public class CreditAnalysisOrchestrator {
     @Autowired
     private AnalyzeCreditUseCase analyzeCreditUseCase;
 
+    @Autowired
+    private PromptInjectionGuardrail guardrail;
+
     public Flux<String> execute(final String sessionId, final String command) {
-        return switch (sessionService.getStage(sessionId)) {
+        CreditAnalysisStage stage = sessionService.getStage(sessionId);
+
+        // Apenas o estágio COLLECT_DATA recebe input direto do usuário.
+        // Os demais são fluxos internos e não precisam ser validados novamente.
+        if (stage != CreditAnalysisStage.COLLECT_DATA) {
+            return routeToStage(sessionId, command, stage);
+        }
+
+        // Valida o input do usuário antes de passar para o agente
+        return Flux.from(
+                guardrail.validate(command)
+                        .flatMapMany(result -> {
+                            if (result.blocked()) {
+                                return Flux.just("⚠️ " + result.reason());
+                            }
+                            return routeToStage(sessionId, command, sessionService.getStage(sessionId));
+                        })
+        );
+    }
+
+    private Flux<String> routeToStage(final String sessionId, final String command, final CreditAnalysisStage stage) {
+        return switch (stage) {
             case COLLECT_DATA    -> onCollectData(sessionId, command);
             case FETCH_CPF_SCORE -> onFetchCpfScore(sessionId, command);
             case ANALYZE         -> onAnalyze(sessionId, command);
