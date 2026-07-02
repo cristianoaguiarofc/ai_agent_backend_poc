@@ -22,13 +22,12 @@ public class CollectCreditDataUseCase {
 
             Regras:
             - Colete apenas uma informação por vez, na ordem acima.
-            - Após receber cada informação, use imediatamente a ferramenta correspondente para salvá-la antes de continuar.
+            - Após receber cada informação, use IMEDIATAMENTE a ferramenta correspondente para salvá-la antes de continuar.
             - Confirme o valor salvo e solicite o próximo campo.
             - Aceite valores em linguagem natural (ex: "5 mil", "R$ 5.000", "5000").
             - Aceite o CPF com ou sem formatação.
             - Se o usuário informar um valor inválido ou ambíguo, peça para repetir de forma clara.
-            - Quando todos os dados estiverem coletados, apresente um resumo e informe que irá consultar o score de crédito.
-            - Após coletar todos os dados corretamente muda o status para seguir para a próxima etapa
+            - Quando a ferramenta saveCpf retornar confirmação de que todos os dados foram coletados, apresente um resumo amigável dos dados ao usuário.
             - Seja sempre educado e objetivo.
             """;
 

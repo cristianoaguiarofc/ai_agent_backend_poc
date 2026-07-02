@@ -12,8 +12,6 @@ public class FormCollectionTools {
     private final String sessionId;
     private final CreditAnalysisSessionService sessionService;
 
-    @Autowired
-
     public FormCollectionTools(String sessionId, CreditAnalysisSessionService sessionService) {
         this.sessionId = sessionId;
         this.sessionService = sessionService;
@@ -45,12 +43,7 @@ public class FormCollectionTools {
         String digits = cpf.replaceAll("[^\\d]", "");
         var form = sessionService.getForm(sessionId).withCpf(digits);
         sessionService.saveForm(sessionId, form);
+        sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
         return "CPF registrado.";
-    }
-
-    @Tool(description = "Segue para a próxima etapa")
-    public String changeStatus() {
-        this.sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
-        return "Indo para a próxima etapa. Perguntar: 'Podemos continuar?'";
     }
 }

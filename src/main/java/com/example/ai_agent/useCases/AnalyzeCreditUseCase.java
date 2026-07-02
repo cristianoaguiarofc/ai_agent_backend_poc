@@ -2,6 +2,7 @@ package com.example.ai_agent.useCases;
 
 import com.example.ai_agent.models.CreditAnalysisForm;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
+import com.example.ai_agent.tools.AnalyzeCreditTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -30,6 +31,8 @@ public class AnalyzeCreditUseCase {
             Calcule a parcela estimada (valor / prazo) e verifique se ela compromete mais de 30%% da renda mensal.
             Com base nisso, emita um dos três vereditos: APROVADO, APROVADO COM CONDIÇÕES ou REPROVADO.
             Explique brevemente o raciocínio da decisão ao cliente de forma clara e respeitosa.
+            
+            Por último use a ferramenta `changeStep` para avançar para a próxima etapa.
             """;
 
     @Autowired
@@ -52,9 +55,12 @@ public class AnalyzeCreditUseCase {
                 form.score() != null ? form.score() : 0
         );
 
+        var tools = new AnalyzeCreditTools(sessionId, sessionService);
+
         return chatClient.prompt()
                 .system(systemPrompt)
                 .user("Realize a análise de crédito com os dados fornecidos.")
+                .tools(tools)
                 .advisors(spec -> spec
                         .advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                         .param("chat_memory_conversation_id", sessionId))

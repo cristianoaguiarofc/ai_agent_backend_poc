@@ -2,6 +2,7 @@ package com.example.ai_agent.useCases;
 
 import com.example.ai_agent.models.CreditAnalysisForm;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
+import com.example.ai_agent.tools.FetchCpfScoreTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -27,6 +28,8 @@ public class FetchCpfScoreUseCase {
             Use a ferramenta `get_score` com o CPF acima para consultar o score de crédito.
             Após obter o score, informe o resultado ao usuário de forma clara: mencione o número do score na resposta.
             Não invente scores — use sempre a ferramenta.
+            
+            Por último use a ferramenta `changeStep` para avançar para a próxima etapa.
             """;
 
     private static final Pattern SCORE_PATTERN = Pattern.compile("\\b([0-9]{1,4})\\b");
@@ -55,10 +58,12 @@ public class FetchCpfScoreUseCase {
 
         StringBuilder accumulated = new StringBuilder();
 
+        var tools = new FetchCpfScoreTools(sessionId, sessionService);
+
         return chatClient.prompt()
                 .system(systemPrompt)
                 .user("Consulte o score do CPF " + form.cpf() + " agora.")
-                .tools(toolCallbackProvider)
+                .tools(tools, toolCallbackProvider)
                 .advisors(spec -> spec
                         .advisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                         .param("chat_memory_conversation_id", sessionId))
