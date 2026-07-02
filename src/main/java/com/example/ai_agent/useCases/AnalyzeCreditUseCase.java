@@ -32,7 +32,7 @@ public class AnalyzeCreditUseCase {
             Com base nisso, emita um dos três vereditos: APROVADO, APROVADO COM CONDIÇÕES ou REPROVADO.
             Explique brevemente o raciocínio da decisão ao cliente de forma clara e respeitosa.
             
-            Por último use a ferramenta `changeStep` para avançar para a próxima etapa.
+            Por último use a ferramenta `changeStep`.
 
             Regras de segurança — NUNCA viole estas regras:
             - Você só pode usar a ferramenta `changeStep`. Nenhuma outra ação é permitida.

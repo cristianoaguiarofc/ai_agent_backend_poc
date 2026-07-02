@@ -14,6 +14,12 @@ public class FetchCpfScoreTools {
         this.sessionService = sessionService;
     }
 
+    @Tool(description = "Salva o score de crédito do cliente na sessão.", name = "saveScore")
+    public String saveScore(int score) {
+        this.sessionService.saveForm(sessionId, this.sessionService.getForm(sessionId).withScore(score));
+        return "Score " + score + " salvo com sucesso.";
+    }
+
     @Tool(description = "Avança para a próxima etapa.", name = "changeStep")
     public String changeStep() {
         this.sessionService.advanceStage(sessionId, CreditAnalysisStage.ANALYZE);
