@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: ai_agent
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: gemma4:e2b
+    mcp:
+      client:
+        streamable-http:
+          connections:
+            score-service:
+              url: http://localhost:8090
+              endpoint: /mcp
+    chat:
+      observations:
+        log-prompt: true # Include prompt content in tracing (disabled by default for privacy)
+        log-completion: true # Include completion content in tracing (disabled by default)
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0 # Sample 100% of requests for full tracing (adjust in production as needed)
+  observations:
+    annotations:
+      enabled: true # Enable @Observed (if you use observation annotations in code)
+    enable:
+      "http.server.requests": false # Suppress duplicate Micrometer HTTP server spans
+      "http.client.requests": false # Suppress duplicate Micrometer HTTP client spans
+
+otel:
+  instrumentation:
+    spring-webmvc:
+      enabled: false # Suppress duplicate OTel HTTP server spans
+    spring-web:
+      enabled: false # Suppress duplicate OTel HTTP client spans
