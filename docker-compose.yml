@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  grafana-lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: otel-lgtm
+    ports:
+      - "3000:3000"   # Grafana Web UI
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+    environment:
+      - LOKI_WRITE_AHEAD_LOG_ENABLED=false
+      # IMPORTANTE: Ativa os logs internos do Coletor e do Tempo para vermos erros
+      - ENABLE_LOGS_OTELCOL=true
+      - ENABLE_LOGS_TEMPO=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

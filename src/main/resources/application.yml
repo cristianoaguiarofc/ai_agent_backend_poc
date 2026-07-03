@@ -1,7 +1,6 @@
 spring:
   application:
     name: ai_agent
-
   ai:
     ollama:
       base-url: http://localhost:11434
@@ -17,23 +16,18 @@ spring:
               endpoint: /mcp
     chat:
       observations:
-        log-prompt: true # Include prompt content in tracing (disabled by default for privacy)
-        log-completion: true # Include completion content in tracing (disabled by default)
+        include-prompt: true       # Sends prompts as trace tags
+        include-completion: true   # Sends responses as trace tag
 
 management:
+  otlp:
+    tracing:
+      endpoint: http://localhost:4317 # Use a porta gRPC se estiver usando o starter OpenTelemetry
   tracing:
+    enabled: true # Garante que o tracing está ativo
     sampling:
-      probability: 1.0 # Sample 100% of requests for full tracing (adjust in production as needed)
-  observations:
-    annotations:
-      enabled: true # Enable @Observed (if you use observation annotations in code)
-    enable:
-      "http.server.requests": false # Suppress duplicate Micrometer HTTP server spans
-      "http.client.requests": false # Suppress duplicate Micrometer HTTP client spans
+      probability: 1.0 # Força o envio de 100% das requisições (mude em produção)
 
-otel:
-  instrumentation:
-    spring-webmvc:
-      enabled: false # Suppress duplicate OTel HTTP server spans
-    spring-web:
-      enabled: false # Suppress duplicate OTel HTTP client spans
+logging:
+  level:
+    root: DEBUG

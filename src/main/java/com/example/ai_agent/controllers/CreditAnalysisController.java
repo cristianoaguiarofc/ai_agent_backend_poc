@@ -3,6 +3,8 @@ package com.example.ai_agent.controllers;
 import com.example.ai_agent.models.CreditAnalysisForm;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
 import com.example.ai_agent.useCases.CreditAnalysisOrchestrator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @RequestMapping("/chat")
 public class CreditAnalysisController {
 
+    private static final Logger log = LoggerFactory.getLogger(CreditAnalysisController.class);
     @Autowired
     private CreditAnalysisOrchestrator orchestrator;
 
@@ -26,6 +29,7 @@ public class CreditAnalysisController {
             @RequestParam(value = "command") final String command,
             @RequestParam(value = "sessionId", required = false) String sessionId
     ) {
+        log.info("log de teste");
         if (sessionId == null || sessionId.isBlank()) {
             sessionId = UUID.randomUUID().toString();
         }
