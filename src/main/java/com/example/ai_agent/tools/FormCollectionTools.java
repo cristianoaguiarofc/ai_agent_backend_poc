@@ -46,4 +46,10 @@ public class FormCollectionTools {
         sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
         return "CPF registrado.";
     }
+
+    @Tool(description = "Avança para a próxima etapa.", name = "changeStep")
+    public String changeStep() {
+        this.sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
+        return "Informações coletadas. Prosseguindo para a próxima etapa.";
+    }
 }
