@@ -2,15 +2,15 @@ package com.example.ai_agent.controllers;
 
 import com.example.ai_agent.models.CreditAnalysisForm;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
-import com.example.ai_agent.useCases.CreditAnalysisOrchestrator;
+import com.example.ai_agent.useCases.CollectCreditDataUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
-import java.util.Map;
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -18,29 +18,29 @@ import java.util.UUID;
 public class CreditAnalysisController {
 
     private static final Logger log = LoggerFactory.getLogger(CreditAnalysisController.class);
-    @Autowired
-    private CreditAnalysisOrchestrator orchestrator;
 
-    @Autowired
-    private CreditAnalysisSessionService sessionService;
+    private final CollectCreditDataUseCase collectCreditDataUseCase;
+
+    private final CreditAnalysisSessionService sessionService;
+
+    public CreditAnalysisController(
+            CollectCreditDataUseCase collectCreditDataUseCase,
+            CreditAnalysisSessionService sessionService
+    ) {
+        this.collectCreditDataUseCase = collectCreditDataUseCase;
+        this.sessionService = sessionService;
+    }
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chat(
             @RequestParam(value = "command") final String command,
             @RequestParam(value = "sessionId", required = false) String sessionId
     ) {
-        log.info("log de teste");
         if (sessionId == null || sessionId.isBlank()) {
             sessionId = UUID.randomUUID().toString();
         }
-        return this.orchestrator.execute(sessionId, command);
-    }
-
-    @PostMapping("/session")
-    public Map<String, String> createSession() {
-        String sessionId = UUID.randomUUID().toString();
-        sessionService.initSession(sessionId);
-        return Map.of("sessionId", sessionId);
+        log.info("Starting chat stream for session {}", sessionId);
+        return this.collectCreditDataUseCase.execute(sessionId, command);
     }
 
     @GetMapping("/form/{sessionId}")

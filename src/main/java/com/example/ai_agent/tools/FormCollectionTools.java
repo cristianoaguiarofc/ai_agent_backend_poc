@@ -1,9 +1,7 @@
 package com.example.ai_agent.tools;
 
-import com.example.ai_agent.models.CreditAnalysisStage;
 import com.example.ai_agent.services.CreditAnalysisSessionService;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -43,13 +41,12 @@ public class FormCollectionTools {
         String digits = cpf.replaceAll("[^\\d]", "");
         var form = sessionService.getForm(sessionId).withCpf(digits);
         sessionService.saveForm(sessionId, form);
-        sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
         return "CPF registrado.";
     }
 
-    @Tool(description = "Avança para a próxima etapa.", name = "changeStep")
-    public String changeStep() {
-        this.sessionService.advanceStage(sessionId, CreditAnalysisStage.FETCH_CPF_SCORE);
-        return "Informações coletadas. Prosseguindo para a próxima etapa.";
+    @Tool(description = "Salva o score de crédito do cliente na sessão.", name = "saveScore")
+    public String saveScore(int score) {
+        this.sessionService.saveForm(sessionId, this.sessionService.getForm(sessionId).withScore(score));
+        return "Score " + score + " salvo com sucesso.";
     }
 }

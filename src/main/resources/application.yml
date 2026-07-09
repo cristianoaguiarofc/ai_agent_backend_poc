@@ -6,9 +6,12 @@ spring:
       base-url: http://localhost:11434
       chat:
         options:
-          model: gemma4
+          model: gemma4:e2b
     mcp:
       client:
+        type: ASYNC
+        toolcallback:
+          enabled: true
         streamable-http:
           connections:
             score-service:
