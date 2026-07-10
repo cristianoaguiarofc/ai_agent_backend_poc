@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 public class CreditAnalysisController {
 
     private static final Logger log = LoggerFactory.getLogger(CreditAnalysisController.class);
